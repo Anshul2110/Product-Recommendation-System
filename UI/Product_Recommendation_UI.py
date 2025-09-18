@@ -5,7 +5,7 @@ from surprise import Dataset, Reader, SVD, KNNBasic
 from surprise.model_selection import train_test_split
 import matplotlib.pyplot as plt
 
-# --- Step 1: Load Data ---
+# loading data
 @st.cache_data
 def load_data():
     df = pd.read_csv(r"C:\Users\ansul\OneDrive\Desktop\data science project\Product-Recommendation-System\Data\ratings_processed.csv")   # Replace with your file path
@@ -18,7 +18,7 @@ df = load_data()
 st.title(" Amazon Product Recommendation System")
 
 
-# --- Step 2: Train Models ---
+# training models
 @st.cache_resource
 def train_models(df):
     reader = Reader(rating_scale=(1, 5))
@@ -38,7 +38,7 @@ def train_models(df):
 
 svd, knn_item = train_models(df)
 
-# --- Step 3: Hybrid Recommendation Function ---
+# Building hybrid recommendation function
 def hybrid_recommend(user_id, top_n=5, alpha=0.7):
     all_products = df["productId"].unique()
     user_rated = df[df["userId"] == user_id]["productId"].unique()
@@ -55,7 +55,7 @@ def hybrid_recommend(user_id, top_n=5, alpha=0.7):
     scores = sorted(scores, key=lambda x: x[1], reverse=True)[:top_n]
     return scores
 
-# --- Step 4: Streamlit UI ---
+# streamlit UI
 st.sidebar.header("User Options")
 user_ids = df["userId"].unique()
 selected_user = st.sidebar.selectbox("Select a User", user_ids)
@@ -69,7 +69,7 @@ if st.sidebar.button("Get Recommendations"):
     recs_df = pd.DataFrame(recs, columns=["ProductID", "Predicted Rating"])
     st.table(recs_df)
 
-# --- Step 5: Popularity-Based Recommendations ---
+# For cold start popular products are shown
 st.subheader("Top 10 Popular Products (By Avg Rating)")
 popularity = df.groupby("productId")["Rating"].mean().sort_values(ascending=False).head(10)
 st.table(popularity)
